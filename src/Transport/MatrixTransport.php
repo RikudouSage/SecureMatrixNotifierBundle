@@ -39,18 +39,20 @@ final class MatrixTransport extends AbstractTransport
             throw new UnsupportedMessageTypeException(__CLASS__, ChatMessage::class, $message);
         }
 
-        if (($options = $message->getOptions()) && !$message->getOptions() instanceof MatrixOptions) {
-            throw new UnsupportedOptionsException(__CLASS__, MatrixOptions::class, $options);
+        $options = $message->getOptions();
+        if (!$options instanceof MatrixOptions) {
+            $options = new MatrixOptions(
+                recipientId: $options?->getRecipientId(),
+            );
         }
-        assert($options instanceof MatrixOptions || $options === null);
 
         if (!$message->getRecipientId()) {
             throw new LogicException('Recipient id is required.');
         }
 
         $bridgeMessage = new BridgeMessage(
-            messageType: $options?->messageType ?? MessageType::TextMessage,
-            renderingType: $options?->renderingType ?? RenderingType::PlainText,
+            messageType: $options->messageType ?? MessageType::TextMessage,
+            renderingType: $options->renderingType ?? RenderingType::PlainText,
             message: $message->getSubject(),
             recipient: $message->getRecipientId(),
             databasePath: $this->dbPath,
