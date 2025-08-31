@@ -32,7 +32,7 @@ final readonly class Configuration implements ConfigurationInterface
                     ->info('The recovery key for the bot account, the easiest way to get it is to login to the account using Element and copying it from there (or setting it up if you have not yet). Note that this is the most sensitive secret a Matrix account has (even more than your password), treat it with care.')
                 ->end()
                 ->stringNode('server_hostname')
-                    ->info('The base server url (aka hostname, optionally a port, WITHOUT scheem). Only needed if you plan to use the rikudou:notifier:matrix:initialize-keys command. Can be called as rikudou.matrix_notifier.server_hostname parameter')
+                    ->info('The base server url (aka hostname, optionally a port, WITHOUT scheme). Only needed if you plan to use the rikudou:notifier:matrix:initialize-keys command. Can be called as rikudou.matrix_notifier.server_hostname parameter')
                 ->end()
             ->end()
         ;
