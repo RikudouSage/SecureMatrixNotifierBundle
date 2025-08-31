@@ -45,13 +45,13 @@ final class MatrixTransportFactory extends AbstractTransportFactory
     public function create(Dsn $dsn): TransportInterface
     {
         if (!$this->pickleKey) {
-            throw new LogicException('The pickle key is not initialized, please configure it');
+            throw new LogicException('The pickle key is not initialized, please configure it. You can run the rikudou:notifier:matrix:initialize-keys to help you generate it.');
         }
         if (!$this->deviceId) {
-            throw new LogicException('The device ID is not initialized, please configure it');
+            throw new LogicException('The device ID is not initialized, please configure it. You can run the rikudou:notifier:matrix:initialize-keys to help you generate it.');
         }
         if (!$this->recoveryKey) {
-            throw new LogicException('The recovery key is not initialized, please configure it');
+            throw new LogicException('The recovery key is not initialized, please configure it.');
         }
 
         if (!in_array($dsn->getScheme(), $this->getSupportedSchemes(), true)) {
