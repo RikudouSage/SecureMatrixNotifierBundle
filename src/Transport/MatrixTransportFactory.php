@@ -23,7 +23,7 @@ final class MatrixTransportFactory extends AbstractTransportFactory
         #[SensitiveParameter] private readonly ?string $pickleKey,
         private readonly ?string $deviceId,
         #[SensitiveParameter] private readonly ?string $accessToken,
-        #[SensitiveParameter] private readonly string $recoveryKey,
+        #[SensitiveParameter] private readonly ?string $recoveryKey,
         private readonly string $databasePath,
         private readonly GolangLibBridge $bridge,
         ?EventDispatcherInterface $dispatcher = null,
@@ -49,6 +49,9 @@ final class MatrixTransportFactory extends AbstractTransportFactory
         }
         if (!$this->deviceId) {
             throw new LogicException('The device ID is not initialized, please configure it');
+        }
+        if (!$this->recoveryKey) {
+            throw new LogicException('The recovery key is not initialized, please configure it');
         }
 
         if (!in_array($dsn->getScheme(), $this->getSupportedSchemes(), true)) {
