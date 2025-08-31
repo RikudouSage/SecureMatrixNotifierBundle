@@ -66,6 +66,10 @@ final class MatrixTransportFactory extends AbstractTransportFactory
             throw new MatrixException("The access token must be provided either as part of DSN or as a configuration parameter.");
         }
 
+        if (!is_dir(dirname($this->databasePath))) {
+            mkdir(dirname($this->databasePath), 0777, true);
+        }
+
         return new MatrixTransport(
             accessToken: $token,
             recoveryKey: $this->recoveryKey,
