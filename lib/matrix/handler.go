@@ -3,7 +3,9 @@ package matrix
 import (
 	"context"
 	"fmt"
+	"lib/fs"
 	"lib/types"
+	"path"
 	"sync"
 
 	"maunium.net/go/mautrix"
@@ -24,6 +26,8 @@ func SendMessage(
 	url string,
 	deviceId id.DeviceID,
 ) (messageId string, err error) {
+	err = fs.EnsureDirectoryExists(path.Dir(databasePath))
+
 	client, err := mautrix.NewClient(url, "", accessToken)
 	if err != nil {
 		return
