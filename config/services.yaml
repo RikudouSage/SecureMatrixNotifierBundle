@@ -1,0 +1,26 @@
+services:
+  rikudou.matrix_notifier.golang_bridge:
+    lazy: true
+    class: Rikudou\MatrixNotifier\Bridge\GolangLibBridge
+
+  rikudou.matrix_notifier.notifier.transport_factory.matrix:
+    class: Rikudou\MatrixNotifier\Transport\MatrixTransportFactory
+    arguments:
+      $accessToken: '%rikudou.internal.matrix.access_token%'
+      $databasePath: '%rikudou.internal.matrix.database_path%'
+      $deviceId: '%rikudou.internal.matrix.device_id%'
+      $pickleKey: '%rikudou.internal.matrix.pickle_key%'
+      $recoveryKey: '%rikudou.internal.matrix.recovery_key%'
+      $bridge: '@rikudou.matrix_notifier.golang_bridge'
+      $dispatcher: '@?event_dispatcher'
+      $client: '@?http_client'
+    tags:
+      - chatter.transport_factory
+
+  rikudou.matrix_notifier.command.initialize:
+    class: Rikudou\MatrixNotifier\Command\InitializeCommand
+    arguments:
+      $bridge: '@rikudou.matrix_notifier.golang_bridge'
+      $serverUrl: 'https://%rikudou.matrix_notifier.server_hostname%'
+    tags:
+      - console.command

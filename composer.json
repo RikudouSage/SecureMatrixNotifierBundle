@@ -1,0 +1,24 @@
+{
+  "name": "rikudou/notifier-matrix-bundle",
+  "license": "MIT",
+  "type": "symfony-bundle",
+  "require": {
+    "symfony/notifier": "^7.3",
+    "php": "^8.4",
+    "symfony/event-dispatcher-contracts": "^3.6",
+    "symfony/http-client-contracts": "^3.6",
+    "ext-ffi": "*",
+    "symfony/console": "^7.3",
+    "symfony/http-kernel": "^7.3",
+    "symfony/dependency-injection": "^7.3",
+    "symfony/config": "^7.3"
+  },
+  "autoload": {
+    "psr-4": {
+      "Rikudou\\MatrixNotifier\\": "src/"
+    }
+  },
+  "require-dev": {
+    "symfony/matrix-notifier": "^7.3"
+  }
+}
