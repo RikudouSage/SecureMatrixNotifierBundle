@@ -29,7 +29,6 @@ final readonly class Configuration implements ConfigurationInterface
                     ->info('An access token to use with the api, usually obtained by logging in. You can use the rikudou:notifier:matrix:initialize-keys command to login and generate an access token. Can be also set as part of the notifier DSN for compatibility purposes.')
                 ->end()
                 ->stringNode('recovery_key')
-                    ->isRequired()
                     ->info('The recovery key for the bot account, the easiest way to get it is to login to the account using Element and copying it from there (or setting it up if you have not yet). Note that this is the most sensitive secret a Matrix account has (even more than your password), treat it with care.')
                 ->end()
                 ->stringNode('server_hostname')
