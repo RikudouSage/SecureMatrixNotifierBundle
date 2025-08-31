@@ -21,6 +21,6 @@ services:
     class: Rikudou\MatrixNotifier\Command\InitializeCommand
     arguments:
       $bridge: '@rikudou.matrix_notifier.golang_bridge'
-      $serverUrl: 'https://%rikudou.matrix_notifier.server_hostname%'
+      $serverUrl: '%rikudou.matrix_notifier.server_url%'
     tags:
       - console.command
