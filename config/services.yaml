@@ -2,6 +2,9 @@ services:
   rikudou.matrix_notifier.golang_bridge:
     lazy: true
     class: Rikudou\MatrixNotifier\Bridge\GolangLibBridge
+    arguments:
+      $headerPath: '%rikudou.internal.matrix.headers_path%'
+      $libraryPath: '%rikudou.internal.matrix.lib_path%'
 
   rikudou.matrix_notifier.notifier.transport_factory.matrix:
     class: Rikudou\MatrixNotifier\Transport\MatrixTransportFactory

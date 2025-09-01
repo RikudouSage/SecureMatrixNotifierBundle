@@ -14,6 +14,7 @@ final readonly class Configuration implements ConfigurationInterface
 
         $rootNode = $treeBuilder->getRootNode();
         $rootNode
+            ->addDefaultsIfNotSet()
             ->children()
                 ->stringNode('database_path')
                     ->info('The path to the SQLite database which the Matrix maintains internally, it holds stuff such as room state, cryptography configuration and is needed for the bridge to function. If you lose this database, you must login again and get a new device ID.')
@@ -33,6 +34,20 @@ final readonly class Configuration implements ConfigurationInterface
                 ->end()
                 ->stringNode('server_hostname')
                     ->info('The base server url (aka hostname, optionally a port, WITHOUT scheme). Only needed if you plan to use the rikudou:notifier:matrix:initialize-keys command. Can be called as rikudou.matrix_notifier.server_hostname parameter')
+                ->end()
+                ->arrayNode('lib')
+                    ->addDefaultsIfNotSet()
+                    ->info('You can customize the .so/.h library paths.')
+                    ->children()
+                        ->stringNode('library_path')
+                            ->info('The path to the .so library, leave at null to use the bundled one.')
+                            ->defaultNull()
+                        ->end()
+                        ->stringNode('headers_path')
+                            ->info('Path to the library headers, leave at null to use the bundled one.')
+                            ->defaultNull()
+                        ->end()
+                    ->end()
                 ->end()
             ->end()
         ;
