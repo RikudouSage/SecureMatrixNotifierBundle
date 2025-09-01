@@ -23,3 +23,9 @@ jobs:
           composer config repositories.my-repo vcs https://github.com/${{ github.repository }}.git
       - name: Install package
         run: composer require rikudou/notifier-matrix-bundle:dev-${{ github.ref_name }}
+      - name: Run test script
+        run: |
+          #!/usr/bin/env php
+          <?php     
+          require_one __DIR__ . '/vendor/autoload.php';
+          $bridge = new \Rikudou\MatrixNotifier\Bridge\GolangLibBridge();
