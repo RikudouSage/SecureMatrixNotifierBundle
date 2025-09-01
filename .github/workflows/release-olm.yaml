@@ -13,12 +13,10 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v5
-      - name: Download dependencies
+      - name: Build
         run: |
           cd lib
-          go mod download
-      - name: Build
-        run: make build-linux-x64
+          make build-linux-x64
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
