@@ -14,8 +14,12 @@ jobs:
         include:
           - os: ubuntu-latest
             job: build-linux-x64
+            name: x86_64
+            filePart: x86
           - os: ubuntu-24.04-arm
             job: build-linux-aarch64
+            name: arm64
+            filePart: arm
     name: Compile (x86_64)
     runs-on: ${{ matrix.os }}
     steps:
@@ -26,12 +30,12 @@ jobs:
       - name: Build
         run: |
           cd lib
-          make build-linux-x64
+          make ${{ matrix.job }}
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: 'x86_64'
-          path: lib/out/libmatrix.linux.x86.64.so
+          name: ${{ matrix.name }}
+          path: lib/out/libmatrix.linux.${{ matrix.filePart }}.64.so
           retention-days: 1
 #  compile_x86_64:
 #    name: Compile (x86_64)
