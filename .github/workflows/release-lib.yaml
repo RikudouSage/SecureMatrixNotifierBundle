@@ -7,7 +7,22 @@ on:
   workflow_dispatch: {}
 
 jobs:
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      golang: ${{ steps.filter.outputs.golang }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            golang:
+              - 'lib/**'
+
   compile:
+    needs: changes
+    if: needs.changes.outputs.golang || github.event_name == 'workflow_dispatch'
     strategy:
       matrix:
         os: [ubuntu-latest, ubuntu-24.04-arm]
