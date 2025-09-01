@@ -27,7 +27,7 @@ jobs:
           retention-days: 1
   compile_arm64:
     name: Compile (arm64)
-    runs-on: ubuntu-latest-arm
+    runs-on: ubuntu-24.04-arm
     steps:
       - name: Checkout code
         uses: actions/checkout@v5
