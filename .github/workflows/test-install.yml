@@ -1,0 +1,23 @@
+name: test-install.yml
+on:
+  push:
+    branches:
+      - master
+  pull_request: {}
+  workflow_dispatch: {}
+
+jobs:
+  test_installation:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, ubuntu-24.04-arm]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 8.4
+      - name: Setup composer
+        run: composer config repositories.my-repo vcs https://github.com/${{ github.repository }}.git
+      - name: Install package
+        run: composer require rikudou/notifier-matrix-bundle
