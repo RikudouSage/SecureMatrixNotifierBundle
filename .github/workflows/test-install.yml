@@ -20,4 +20,6 @@ jobs:
       - name: Setup composer
         run: composer config repositories.my-repo vcs https://github.com/${{ github.repository }}.git
       - name: Install package
-        run: composer require rikudou/notifier-matrix-bundle
+        run: |
+          echo "{}" > composer.json
+          composer require rikudou/notifier-matrix-bundle
