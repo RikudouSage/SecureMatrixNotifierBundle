@@ -97,13 +97,14 @@ final readonly class GolangLibBridge
         $parts[] = strtolower(PHP_OS_FAMILY);
 
         if (str_contains($uname, 'arm') || str_contains($uname, 'aarch')) {
-            $parts[] = 'arm';
+            $archName = 'arm';
         } else {
-            $parts[] = 'x86';
+            $archName = 'x86';
         }
+        $parts[] = $archName;
 
         $parts[] = PHP_INT_SIZE === 4 ? '32' : '64';
 
-        return implode('.', $parts);
+        return $archName . '/' . implode('.', $parts);
     }
 }
