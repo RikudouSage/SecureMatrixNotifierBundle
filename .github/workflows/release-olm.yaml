@@ -21,3 +21,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           path: lib/out/libmatrix.linux.x86.64.so
+          retention-days: 1
