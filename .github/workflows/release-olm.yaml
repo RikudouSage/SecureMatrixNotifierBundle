@@ -1,7 +1,9 @@
 name: Compile Golang bridge
 on:
   push:
-    branches: {}
+    branches:
+      - master
+  pull_request: {}
   workflow_dispatch: {}
 
 jobs:
