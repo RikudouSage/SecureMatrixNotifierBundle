@@ -1,0 +1,30 @@
+name: Fetch OLM
+on:
+  workflow_dispatch: {}
+
+jobs:
+  download:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, ubuntu-24.04-arm]
+        include:
+          - os: ubuntu-latest
+            name: x86
+          - os: ubuntu-24.04-arm
+            name: arm
+    name: Fetch (${{ matrix.name }})
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Install libolm
+        run: sudo apt-get update && sudo apt-get -y install libolm-dev
+      - name: Find olm file
+        id: finder
+        run: |
+          export FILE=$(readlink -f /lib/x86_64-linux-gnu/libolm.so.3)
+          echo "olm_file=$FILE" >> "$GITHUB_OUTPUT"
+      - name: Store artifact
+        uses: actions/upload-artifact@v4
+        with:
+          retention-days: 1
+          name: ${{ matrix.name }}
+          path: ${{ steps.finder.outputs.olm_file }}
