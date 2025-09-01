@@ -20,7 +20,7 @@ jobs:
             job: build-linux-aarch64
             name: arm64
             filePart: arm
-    name: Compile (x86_64)
+    name: Compile (${{ matrix.name }})
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout code
