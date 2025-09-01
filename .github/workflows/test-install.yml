@@ -11,6 +11,12 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, ubuntu-24.04-arm]
+        include:
+          - os: ubuntu-latest
+            name: x86_64
+          - os: ubuntu-24.04-arm
+            name: arm64
+    name: Test installation (${{ matrix.name }})
     runs-on: ${{ matrix.os }}
     steps:
       - name: Setup PHP
@@ -24,8 +30,4 @@ jobs:
       - name: Install package
         run: composer require rikudou/notifier-matrix-bundle:dev-${{ github.ref_name }}
       - name: Run test script
-        run: |
-          #!/usr/bin/env php
-          <?php     
-          require_one __DIR__ . '/vendor/autoload.php';
-          $bridge = new \Rikudou\MatrixNotifier\Bridge\GolangLibBridge();
+        run: php -r "require __DIR__ . '/vendor/autoload.php'; new \Rikudou\MatrixNotifier\Bridge\GolangLibBridge();"
