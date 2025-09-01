@@ -12,13 +12,15 @@ final readonly class GolangLibBridge
 {
     private FFI $ffi;
 
-    public function __construct()
-    {
+    public function __construct(
+        ?string $headerPath = null,
+        ?string $libraryPath = null,
+    ) {
         $libDir = __DIR__ . '/../../lib/out';
 
         $basePath = $this->getBaseFileName();
-        $headerPath = "{$libDir}/{$basePath}.h";
-        $soPath = "{$libDir}/{$basePath}.so";
+        $headerPath ??= "{$libDir}/{$basePath}.h";
+        $libraryPath ??= "{$libDir}/{$basePath}.so";
 
         if (!file_exists($headerPath)) {
             throw new MatrixException(sprintf(
@@ -30,7 +32,7 @@ final readonly class GolangLibBridge
 
         $this->ffi = FFI::cdef(
             file_get_contents($headerPath) ?: throw new MatrixException("Failed to read the {$headerPath} file"),
-            $soPath,
+            $libraryPath,
         );
     }
 
