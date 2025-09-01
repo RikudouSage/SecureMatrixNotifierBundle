@@ -8,11 +8,12 @@ on:
 
 jobs:
   changes:
+    name: Detect changes
     runs-on: ubuntu-latest
     outputs:
       golang: ${{ steps.filter.outputs.golang }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: dorny/paths-filter@v3
         id: filter
         with:
