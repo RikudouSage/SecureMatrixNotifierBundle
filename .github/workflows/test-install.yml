@@ -30,4 +30,8 @@ jobs:
       - name: Install package
         run: composer require rikudou/notifier-matrix-bundle:dev-${{ github.ref_name }}
       - name: Run test script
-        run: php -r "require __DIR__ . '/vendor/autoload.php'; new \Rikudou\MatrixNotifier\Bridge\GolangLibBridge();"
+        shell: php {0}
+        run: |
+          <?php     
+          require_one __DIR__ . '/vendor/autoload.php';
+          $bridge = new \Rikudou\MatrixNotifier\Bridge\GolangLibBridge();
