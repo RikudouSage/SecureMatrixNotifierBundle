@@ -23,7 +23,7 @@ jobs:
 
   compile:
     needs: changes
-    if: ${{ needs.changes.outputs.golang || github.event_name == 'workflow_dispatch' }}
+    if: needs.changes.outputs.golang == 'true' || github.event_name == 'workflow_dispatch'
     strategy:
       matrix:
         os: [ubuntu-latest, ubuntu-24.04-arm]
