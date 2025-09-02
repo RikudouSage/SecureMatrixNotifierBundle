@@ -12,6 +12,8 @@ if you have a different platform, you can either [open an issue](https://github.
 
 ## Usage
 
+You must have FFI enabled to use this bundle.
+
 ### Configuration
 
 > Tip: Generate the default config using `php bin/console config:dump rikudou_matrix_notifier > config/packages/rikudou_matrix_notifier.yaml`
