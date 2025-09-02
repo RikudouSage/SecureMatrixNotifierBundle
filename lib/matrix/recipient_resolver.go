@@ -3,8 +3,10 @@ package matrix
 import (
 	"context"
 	"errors"
+	"lib/helper"
 
 	"maunium.net/go/mautrix"
+	"maunium.net/go/mautrix/event"
 	"maunium.net/go/mautrix/id"
 )
 
@@ -27,19 +29,42 @@ func resolveRecipient(client *mautrix.Client, recipient string) (id.RoomID, erro
 }
 
 func resolveDirectMessageRecipient(client *mautrix.Client, recipient string) (id.RoomID, error) {
-	resp, err := client.Whoami(context.Background())
+	var out map[string][]id.RoomID
+	err := client.GetAccountData(context.Background(), "m.direct", &out)
 	if err != nil {
 		return "", err
 	}
 
-	_ = resp.UserID
-	var out any
-	err = client.GetAccountData(context.Background(), "m.direct", &out)
+	if data, ok := out[recipient]; ok && len(data) > 0 {
+		return data[len(data)-1], nil
+	}
+
+	respCreate, err := client.CreateRoom(context.Background(), &mautrix.ReqCreateRoom{
+		Preset:   "trusted_private_chat",
+		IsDirect: true,
+		Invite: []id.UserID{
+			id.UserID(recipient),
+		},
+		InitialState: []*event.Event{
+			{
+				Type:     event.StateEncryption,
+				StateKey: helper.ToPointer(""),
+				Content: event.Content{
+					Parsed: map[string]any{
+						"algorithm": id.AlgorithmMegolmV1,
+					},
+				},
+			},
+		},
+	})
 	if err != nil {
 		return "", err
 	}
 
-	return "", errors.New("not implemented yet")
+	out[recipient] = append(out[recipient], respCreate.RoomID)
+	_ = client.SetAccountData(context.Background(), "m.direct", out)
+
+	return respCreate.RoomID, nil
 }
 
 func resolveRoomAliasRecipient(client *mautrix.Client, recipient string) (id.RoomID, error) {
