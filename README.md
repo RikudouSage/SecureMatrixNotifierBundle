@@ -137,6 +137,11 @@ As for options, it can either use its custom `Rikudou\MatrixNotifier\Options\Mat
 `Symfony\Component\Notifier\Bridge\Matrix\MatrixOptions`. You can also use any other `MessageOptionsInterface`
 instance, but only the recipient ID will be used.
 
+### Differences to the Symfony bundle
+
+- the `ssl` dsn parameter is not supported, this bundle always uses https
+- only the `text` and `notice` message types are supported
+
 ## Building the library yourself
 
 You need Golang 1.24 or later. After that simply go to the [lib](lib) directory and run:
