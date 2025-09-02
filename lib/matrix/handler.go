@@ -143,6 +143,9 @@ func SendMessage(
 				content,
 			)
 			break
+		case types.MessageTypeNotice:
+			response, err = client.SendNotice(context.Background(), roomId, message)
+			break
 		default:
 			err = fmt.Errorf("unsupported message type: %s", messageType)
 			break
