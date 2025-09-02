@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"lib/helper"
+	"slices"
 
 	"maunium.net/go/mautrix"
 	"maunium.net/go/mautrix/event"
@@ -35,8 +36,15 @@ func resolveDirectMessageRecipient(client *mautrix.Client, recipient string) (id
 		return "", err
 	}
 
-	if data, ok := out[recipient]; ok && len(data) > 0 {
-		return data[len(data)-1], nil
+	joinedRoomsResp, err := client.JoinedRooms(context.Background())
+	if err != nil {
+		return "", err
+	}
+
+	for _, roomId := range out[recipient] {
+		if slices.Contains(joinedRoomsResp.JoinedRooms, roomId) {
+			return roomId, nil
+		}
 	}
 
 	respCreate, err := client.CreateRoom(context.Background(), &mautrix.ReqCreateRoom{
