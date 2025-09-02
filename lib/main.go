@@ -60,32 +60,4 @@ func Login(homeserver, username, password *C.char, err **C.char, deviceId **C.ch
 	*accessToken = C.CString(accessTokenStr)
 }
 
-func main() {
-	////deviceId, accessToken, err := matrix.Login(
-	////	"https://redacted",
-	////	"reminder_bot",
-	////	"redacted",
-	////)
-	////if err != nil {
-	////	panic(err)
-	////}
-	////
-	////log.Println(deviceId)
-	////log.Println(accessToken)
-	//
-	//result, err := matrix.SendMessage(
-	//	types.MessageTypeTextMessage,
-	//	types.RenderingTypeMarkdown,
-	//	"*Hello* **there**!",
-	//	"#test-room:redacted",
-	//	"redacted",
-	//	"redacted",
-	//	"redacted",
-	//	[]byte("redacted"),
-	//	"https://redacted",
-	//	"redacted",
-	//)
-	//
-	//log.Println(result, err)
-	////<-make(chan int)
-}
+func main() {}

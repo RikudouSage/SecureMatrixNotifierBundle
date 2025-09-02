@@ -13,8 +13,8 @@ final readonly class GolangLibBridge
     private FFI $ffi;
 
     public function __construct(
-        ?string $headerPath = null,
         ?string $libraryPath = null,
+        ?string $headerPath = null,
     ) {
         $libDir = __DIR__ . '/../../lib/out';
 
