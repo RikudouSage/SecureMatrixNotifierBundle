@@ -27,6 +27,7 @@ final class MatrixTransport extends AbstractTransport
         private readonly string $deviceId,
         private readonly string $dbPath,
         private readonly GolangLibBridge $bridge,
+        private readonly ?string $defaultRecipient,
         ?HttpClientInterface $client = null,
         ?EventDispatcherInterface $dispatcher = null,
     ) {
@@ -42,7 +43,7 @@ final class MatrixTransport extends AbstractTransport
         $options = $message->getOptions();
         if (!$options instanceof MatrixOptions) {
             $options = new MatrixOptions(
-                recipientId: $options?->getRecipientId(),
+                recipientId: $options?->getRecipientId() ?? $this->defaultRecipient,
             );
         }
 

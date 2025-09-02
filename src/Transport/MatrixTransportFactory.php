@@ -24,6 +24,7 @@ final class MatrixTransportFactory extends AbstractTransportFactory
         private readonly ?string $deviceId,
         #[SensitiveParameter] private readonly ?string $accessToken,
         #[SensitiveParameter] private readonly ?string $recoveryKey,
+        private readonly ?string $defaultRecipient,
         private readonly string $databasePath,
         private readonly GolangLibBridge $bridge,
         ?EventDispatcherInterface $dispatcher = null,

@@ -15,6 +15,7 @@ services:
       $pickleKey: '%rikudou.internal.matrix.pickle_key%'
       $recoveryKey: '%rikudou.internal.matrix.recovery_key%'
       $bridge: '@rikudou.matrix_notifier.golang_bridge'
+      $defaultRecipient: '%rikudou.internal.matrix.default_recipient%'
       $dispatcher: '@?event_dispatcher'
       $client: '@?http_client'
     tags:

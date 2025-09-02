@@ -25,5 +25,6 @@ final class RikudouMatrixNotifierExtension extends Extension
         $container->setParameter('rikudou.matrix_notifier.server_url', ($configuration['server_hostname'] ?? null) ? "https://{$configuration['server_hostname']}" : null);
         $container->setParameter('rikudou.internal.matrix.lib_path', $configuration['lib']['library_path'] ?? null);
         $container->setParameter('rikudou.internal.matrix.headers_path', $configuration['lib']['headers_path'] ?? null);
+        $container->setParameter('rikudou.internal.matrix.default_recipient', $configuration['default_recipient'] ?? null);
     }
 }
