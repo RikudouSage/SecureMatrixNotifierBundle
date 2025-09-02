@@ -78,6 +78,7 @@ final class MatrixTransportFactory extends AbstractTransportFactory
             deviceId: $this->deviceId,
             dbPath: $this->databasePath,
             bridge: $this->bridge,
+            defaultRecipient: $this->defaultRecipient,
             client: $this->client,
             dispatcher: $this->dispatcher,
         )->setHost($homeserver)->setPort($port);

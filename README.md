@@ -121,6 +121,18 @@ One of the [MessageType](src/Enum/MessageType.php) enum cases, changes how the c
 How to render the content, one of the [RenderingType](src/Enum/RenderingType.php) enum cases.
 Can be plaintext (default), html or markdown.
 
+## Compatibility with the Symfony bundle
+
+This package is mostly a drop-in replacement for the Symfony Matrix transport bundle and it can even work together with
+it.
+
+If it detects that the Symfony's bundle exists, it doesn't register itself using the `matrix` transport name and
+uses only the custom `smatrix` (**s**ecure **matrix**) transport name.
+
+As for options, it can either use its custom `Rikudou\MatrixNotifier\Options\MatrixOptions`, or the Symfony's
+`Symfony\Component\Notifier\Bridge\Matrix\MatrixOptions`. You can also use any other `MessageOptionsInterface`
+instance, but only the recipient ID will be used.
+
 ## Building the library yourself
 
 You need Golang 1.24 or later. After that simply go to the [lib](lib) directory and run:

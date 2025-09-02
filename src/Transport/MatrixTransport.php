@@ -7,8 +7,10 @@ use Rikudou\MatrixNotifier\Bridge\BridgeMessage;
 use Rikudou\MatrixNotifier\Bridge\GolangLibBridge;
 use Rikudou\MatrixNotifier\Enum\MessageType;
 use Rikudou\MatrixNotifier\Enum\RenderingType;
+use Rikudou\MatrixNotifier\Exception\MatrixException;
 use Rikudou\MatrixNotifier\Options\MatrixOptions;
 use SensitiveParameter;
+use Symfony\Component\Notifier\Bridge\Matrix\MatrixOptions as SymfonyMatrixOptions;
 use Symfony\Component\Notifier\Exception\UnsupportedMessageTypeException;
 use Symfony\Component\Notifier\Exception\UnsupportedOptionsException;
 use Symfony\Component\Notifier\Message\ChatMessage;
@@ -41,6 +43,24 @@ final class MatrixTransport extends AbstractTransport
         }
 
         $options = $message->getOptions();
+        if ($options instanceof SymfonyMatrixOptions) {
+            $optionsArray = $options->toArray();
+            $messageType = MessageType::tryFrom($optionsArray['msgtype'] ?? MessageType::TextMessage->value);
+            $renderingType = ($optionsArray['format'] ?? '') === 'org.matrix.custom.html'
+                ? RenderingType::Html
+                : RenderingType::PlainText
+            ;
+
+            if ($messageType === null) {
+                throw new MatrixException('Unsupported message type: ' . $optionsArray['msgtype']);
+            }
+
+            $options = new MatrixOptions(
+                recipientId: $options->getRecipientId(),
+                messageType: $messageType,
+                renderingType: $renderingType,
+            );
+        }
         if (!$options instanceof MatrixOptions) {
             $options = new MatrixOptions(
                 recipientId: $options?->getRecipientId() ?? $this->defaultRecipient,
