@@ -51,5 +51,5 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.name }}
-          path: lib/out/libmatrix.linux.${{ matrix.filePart }}.64.so
+          path: lib/out/${{ matrix.filePart }}/libmatrix.linux.${{ matrix.filePart }}.64.so
           retention-days: 1
