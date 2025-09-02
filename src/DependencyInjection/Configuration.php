@@ -38,7 +38,6 @@ final readonly class Configuration implements ConfigurationInterface
                 ->stringNode('default_recipient')
                     ->info('The default recipient when no recipient is set directly')
                     ->defaultNull()
-                    ->end()
                 ->end()
                 ->arrayNode('lib')
                     ->addDefaultsIfNotSet()
