@@ -6,6 +6,8 @@ It's mostly drop-in replacement, except it doesn't support disabling SSL checks.
 Because the OLM library used to encrypt messages is not available in PHP, this project uses a custom [Golang library](lib) which is called using PHP FFI. By default, x86_64 and arm64 OS based on libc are supported,
 if you have a different platform, you can either [open an issue](https://github.com/RikudouSage/SecureMatrixNotifierBundle/issues/new) or [build the library yourself](#building-the-library-yourself).
 
+If you need to support a non-libc OS (Windows, Alpine Linux), you must [build the bridge yourself](#building-the-library-yourself).
+
 ## Installation
 
 `composer require rikudou/notifier-matrix-bundle`
