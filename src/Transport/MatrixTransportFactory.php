@@ -43,7 +43,7 @@ final class MatrixTransportFactory extends AbstractTransportFactory
         return $result;
     }
 
-    public function create(Dsn $dsn): TransportInterface
+    public function create(Dsn $dsn): MatrixTransport
     {
         if (!$this->pickleKey) {
             throw new LogicException('The pickle key is not initialized, please configure it. You can run the rikudou:notifier:matrix:initialize-keys to help you generate it.');
