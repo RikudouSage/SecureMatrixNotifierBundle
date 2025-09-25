@@ -1,22 +1,55 @@
 package matrix
 
 import (
+	"io"
+	"net/http"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 
 	"github.com/rs/zerolog"
 	"maunium.net/go/mautrix"
 )
 
+type roundTripFunc func(*http.Request) (*http.Response, error)
+
+func (f roundTripFunc) RoundTrip(req *http.Request) (*http.Response, error) {
+	return f(req)
+}
+
+func newLoggedInTestClient(t *testing.T) *mautrix.Client {
+	t.Helper()
+
+	homeserverURL, err := mautrix.ParseAndNormalizeBaseURL("https://example.org")
+	if err != nil {
+		t.Fatalf("failed to parse homeserver URL: %v", err)
+	}
+
+	stubTransport := roundTripFunc(func(req *http.Request) (*http.Response, error) {
+		body := `{"device_keys":{}}`
+		return &http.Response{
+			StatusCode: http.StatusOK,
+			Body:       io.NopCloser(strings.NewReader(body)),
+			Header:     make(http.Header),
+		}, nil
+	})
+
+	return &mautrix.Client{
+		Syncer:        mautrix.NewDefaultSyncer(),
+		Log:           zerolog.Nop(),
+		UserID:        "@tester:example.org",
+		DeviceID:      "TESTDEVICE",
+		Client:        &http.Client{Transport: stubTransport},
+		HomeserverURL: homeserverURL,
+	}
+}
+
 func TestInitializeEncryptionSuccess(t *testing.T) {
 	tempDir := t.TempDir()
 	databasePath := filepath.Join(tempDir, "crypto.db")
 
-	client := &mautrix.Client{
-		Syncer: mautrix.NewDefaultSyncer(),
-		Log:    zerolog.Nop(),
-	}
+	client := newLoggedInTestClient(t)
 
 	helper, err := initializeEncryption(client, []byte("secret"), databasePath)
 	if err != nil {
@@ -46,10 +79,7 @@ func TestInitializeEncryptionFailsWithoutSyncer(t *testing.T) {
 }
 
 func TestInitializeEncryptionFailsWithEmptyPickleKey(t *testing.T) {
-	client := &mautrix.Client{
-		Syncer: mautrix.NewDefaultSyncer(),
-		Log:    zerolog.Nop(),
-	}
+	client := newLoggedInTestClient(t)
 
 	_, err := initializeEncryption(client, nil, filepath.Join(t.TempDir(), "crypto.db"))
 	if err == nil {
