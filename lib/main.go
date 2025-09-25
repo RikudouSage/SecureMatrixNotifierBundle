@@ -34,6 +34,7 @@ func SendMessage(
 		[]byte(C.GoString(pickleKey)),
 		C.GoString(url),
 		id.DeviceID(C.GoString(deviceId)),
+		nil,
 	)
 
 	if sendErr != nil {

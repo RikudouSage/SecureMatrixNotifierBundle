@@ -23,8 +23,15 @@ func SendMessage(
 	pickleKey []byte,
 	url string,
 	deviceId id.DeviceID,
+	clientFactory func() (*mautrix.Client, error),
 ) (messageId string, err error) {
-	client, err := mautrix.NewClient(url, "", accessToken)
+	if clientFactory == nil {
+		clientFactory = func() (*mautrix.Client, error) {
+			return mautrix.NewClient(url, "", accessToken)
+		}
+	}
+
+	client, err := clientFactory()
 	if err != nil {
 		return
 	}
