@@ -38,8 +38,11 @@ final readonly class GolangLibBridge
 
     public function send(BridgeMessage $bridgeMessage): string
     {
+        $err = $this->ffi->new('char*');
+        $result = null;
+        $errorMessage = null;
+
         try {
-            $err = $this->ffi->new('char*');
             $result = $this->ffi->SendMessage(
                 $bridgeMessage->messageType->value,
                 $bridgeMessage->renderingType->value,
@@ -55,14 +58,22 @@ final readonly class GolangLibBridge
             );
 
             if (!FFI::isNull($err)) {
-                throw new MatrixException(FFI::string($err));
+                $errorMessage = FFI::string($err);
+            } else {
+                return FFI::string($result);
             }
-
-            return FFI::string($result);
         } finally {
             if (isset($result)) {
                 FFI::free($result);
             }
+
+            if (isset($err) && !FFI::isNull($err)) {
+                FFI::free($err);
+            }
+        }
+
+        if ($errorMessage !== null) {
+            throw new MatrixException($errorMessage);
         }
     }
 
