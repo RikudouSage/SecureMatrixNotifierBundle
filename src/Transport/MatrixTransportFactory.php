@@ -67,8 +67,9 @@ final class MatrixTransportFactory extends AbstractTransportFactory
             throw new MatrixException("The access token must be provided either as part of DSN or as a configuration parameter.");
         }
 
-        if (!is_dir(dirname($this->databasePath))) {
-            mkdir(dirname($this->databasePath), 0777, true);
+        $databaseDirectory = dirname($this->databasePath);
+        if (!is_dir($databaseDirectory) && !@mkdir($databaseDirectory, 0777, true) && !is_dir($databaseDirectory)) {
+            throw new MatrixException(sprintf('Failed to create the database directory "%s".', $databaseDirectory));
         }
 
         return new MatrixTransport(
