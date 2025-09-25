@@ -8,12 +8,28 @@ on:
   workflow_dispatch: {}
 
 jobs:
+  changes:
+    name: Detect changes
+    runs-on: ubuntu-latest
+    outputs:
+      golang: ${{ steps.filter.outputs.golang }}
+    steps:
+      - uses: actions/checkout@v5
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            golang:
+              - 'lib/**'
+
   go-tests:
     name: Run Golang tests
     runs-on: ubuntu-latest
+    needs: changes
+    if: needs.changes.outputs.golang == 'true' || github.event_name == 'workflow_dispatch'
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
       - name: Install libolm
         run: sudo apt-get update && sudo apt-get install -y libolm-dev
       - name: Setup Go
