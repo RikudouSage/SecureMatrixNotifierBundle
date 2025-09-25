@@ -23,7 +23,7 @@ func SendMessage(
 	pickleKey []byte,
 	url string,
 	deviceId id.DeviceID,
-	clientFactory func() (*mautrix.Client, error),
+	clientFactory MautrixFactory,
 ) (messageId string, err error) {
 	if clientFactory == nil {
 		clientFactory = func() (*mautrix.Client, error) {

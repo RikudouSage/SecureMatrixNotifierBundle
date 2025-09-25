@@ -50,6 +50,7 @@ func Login(homeserver, username, password *C.char, err **C.char, deviceId **C.ch
 		C.GoString(homeserver),
 		C.GoString(username),
 		C.GoString(password),
+		nil,
 	)
 
 	if errLogin != nil {

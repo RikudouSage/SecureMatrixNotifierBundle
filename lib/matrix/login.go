@@ -7,8 +7,19 @@ import (
 	"maunium.net/go/mautrix/id"
 )
 
-func Login(homeserver string, username string, password string) (deviceId id.DeviceID, accessToken string, err error) {
-	client, err := mautrix.NewClient(homeserver, "", "")
+func Login(
+	homeserver string,
+	username string,
+	password string,
+	mautrixFactory MautrixFactory,
+) (deviceId id.DeviceID, accessToken string, err error) {
+	if mautrixFactory == nil {
+		mautrixFactory = func() (*mautrix.Client, error) {
+			return mautrix.NewClient(homeserver, "", "")
+		}
+	}
+
+	client, err := mautrixFactory()
 	if err != nil {
 		return
 	}
