@@ -19,6 +19,12 @@
     }
   },
   "require-dev": {
-    "symfony/matrix-notifier": "^7.3"
+    "symfony/matrix-notifier": "^7.3",
+    "phpunit/phpunit": "^12.3"
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Rikudou\\MatrixNotifier\\Tests\\": "tests/"
+    }
   }
 }
