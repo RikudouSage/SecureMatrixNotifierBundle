@@ -27,9 +27,14 @@ func SendMessage(
 	deviceId id.DeviceID,
 	clientFactory MautrixFactory,
 ) (messageId string, err error) {
-	database := db.FindProvider(databaseDsn)
-	if database == nil {
-		return "", errors.New("database is nil, the database DSN is invalid")
+	databaseProvider := db.FindProvider(databaseDsn)
+	if databaseProvider == nil {
+		err = errors.New("databaseProvider is nil, the databaseProvider DSN is invalid")
+		return
+	}
+	database, err := databaseProvider.Get(databaseDsn)
+	if err != nil {
+		return
 	}
 
 	if clientFactory == nil {
@@ -53,7 +58,7 @@ func SendMessage(
 	client.DeviceID = deviceId
 	client.Syncer = syncer
 
-	crypto, err := initializeEncryption(client, pickleKey, databaseDsn)
+	crypto, err := initializeEncryption(client, pickleKey, database)
 	if err != nil {
 		return
 	}

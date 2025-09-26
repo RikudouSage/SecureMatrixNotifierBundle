@@ -25,7 +25,7 @@ final class MatrixTransportFactory extends AbstractTransportFactory
         #[SensitiveParameter] private readonly ?string $accessToken,
         #[SensitiveParameter] private readonly ?string $recoveryKey,
         private readonly ?string $defaultRecipient,
-        private readonly string $databasePath,
+        private readonly string $databaseDsn,
         private readonly GolangLibBridge $bridge,
         ?EventDispatcherInterface $dispatcher = null,
         ?HttpClientInterface $client = null,
@@ -67,16 +67,12 @@ final class MatrixTransportFactory extends AbstractTransportFactory
             throw new MatrixException("The access token must be provided either as part of DSN or as a configuration parameter.");
         }
 
-        if (!is_dir(dirname($this->databasePath))) {
-            mkdir(dirname($this->databasePath), 0777, true);
-        }
-
         return new MatrixTransport(
             accessToken: $token,
             recoveryKey: $this->recoveryKey,
             pickleKey: $this->pickleKey,
             deviceId: $this->deviceId,
-            dbPath: $this->databasePath,
+            databaseDsn: $this->databaseDsn,
             bridge: $this->bridge,
             defaultRecipient: $this->defaultRecipient,
             client: $this->client,

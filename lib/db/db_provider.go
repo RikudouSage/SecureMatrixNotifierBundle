@@ -1,12 +1,14 @@
 package db
 
-import "database/sql"
+import (
+	"go.mau.fi/util/dbutil"
+)
 
 var providerList []Provider
 
 type Provider interface {
 	supports(dsn string) bool
-	GetDb(dsn string) (*sql.DB, error)
+	Get(dsn string) (*dbutil.Database, error)
 }
 
 func init() {
