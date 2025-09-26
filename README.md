@@ -6,6 +6,22 @@ It's mostly drop-in replacement, except it doesn't support disabling SSL checks.
 Because the OLM library used to encrypt messages is not available in PHP, this project uses a custom [Golang library](lib) which is called using PHP FFI. By default, x86_64 and arm64 OS based on libc are supported,
 if you have a different platform, you can either [open an issue](https://github.com/RikudouSage/SecureMatrixNotifierBundle/issues/new) or [build the library yourself](#building-the-library-yourself).
 
+## Code flow overview
+
+This diagram outlines what happens once you install the bundle in a Symfony project and send a chat notification.
+
+```mermaid
+flowchart TD
+    symfonyApp[Symfony notifier<br/>ChatMessage/Notification] --> secureTransport[Secure Matrix transport]
+    bundleSetup["Bundle configuration<br/>keys, device, database"] --> secureTransport
+    secureTransport --> bridgeMessage[Bridge message assembled<br/>with notification payload]
+    bridgeMessage --> goBridge[Golang bridge library encrypts<br/>the payload via OLM]
+    goBridge --> matrixServer[Matrix homeserver]
+    goBridge --> symfonyResponse[SentMessage returned<br/>to your Symfony app]
+```
+
+Within the Golang library, the bundle verifies cross-signing keys, initializes the Olm machine, and encrypts the payload before handing it over to your Matrix homeserver.
+
 If you need to support a non-libc OS (Windows, Alpine Linux), you must [build the bridge yourself](#building-the-library-yourself).
 
 ## Installation
