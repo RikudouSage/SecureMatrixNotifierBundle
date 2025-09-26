@@ -20,7 +20,8 @@
   },
   "require-dev": {
     "symfony/matrix-notifier": "^7.3",
-    "phpunit/phpunit": "^12.3"
+    "phpunit/phpunit": "^12.3",
+    "dg/bypass-finals": "^1.9"
   },
   "autoload-dev": {
     "psr-4": {
