@@ -20,7 +20,14 @@ flowchart TD
     goBridge --> symfonyResponse[SentMessage returned<br/>to your Symfony app]
 ```
 
-Within the Golang library, the bundle verifies cross-signing keys, initializes the Olm machine, and encrypts the payload before handing it over to your Matrix homeserver.
+At a glance:
+
+1. Your Symfony notifier hands the chat message to the Secure Matrix transport alongside the bundle configuration.
+2. The transport prepares the bridge message and forwards it to the Golang bridge.
+3. The Golang bridge verifies keys, initializes Olm, and encrypts the payload before handing it to the Matrix homeserver.
+4. Once the homeserver acknowledges the request, the transport surfaces the resulting `SentMessage` back to Symfony.
+
+Under the hood, that Golang step verifies cross-signing keys, initializes the Olm machine, and encrypts the payload before handing it to your Matrix homeserver.
 
 If you need to support a non-libc OS (Windows, Alpine Linux), you must [build the bridge yourself](#building-the-library-yourself).
 
