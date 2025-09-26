@@ -4,6 +4,14 @@
          bootstrap="tests/bootstrap.php"
          colors="true"
 >
+    <coverage cacheDirectory=".phpunit.cache/code-coverage">
+        <include>
+            <directory suffix=".php">src</directory>
+        </include>
+        <exclude>
+            <directory suffix=".php">tests</directory>
+        </exclude>
+    </coverage>
     <testsuites>
         <testsuite name="SecureMatrixNotifierBundle Test Suite">
             <directory>tests</directory>
