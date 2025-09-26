@@ -2,6 +2,7 @@ package matrix
 
 import (
 	"io"
+	"lib/db"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -48,10 +49,11 @@ func newLoggedInTestClient(t *testing.T) *mautrix.Client {
 func TestInitializeEncryptionSuccess(t *testing.T) {
 	tempDir := t.TempDir()
 	databasePath := filepath.Join(tempDir, "crypto.db")
+	database, _ := (&db.SqliteProvider{}).Get(databasePath)
 
 	client := newLoggedInTestClient(t)
 
-	helper, err := initializeEncryption(client, []byte("secret"), databasePath)
+	helper, err := initializeEncryption(client, []byte("secret"), database)
 	if err != nil {
 		t.Fatalf("initializeEncryption returned error: %v", err)
 	}
@@ -72,7 +74,9 @@ func TestInitializeEncryptionFailsWithoutSyncer(t *testing.T) {
 		Log: zerolog.Nop(),
 	}
 
-	_, err := initializeEncryption(client, []byte("secret"), filepath.Join(t.TempDir(), "crypto.db"))
+	database, _ := (&db.SqliteProvider{}).Get(filepath.Join(t.TempDir(), "crypto.db"))
+
+	_, err := initializeEncryption(client, []byte("secret"), database)
 	if err == nil {
 		t.Fatalf("expected error when client syncer does not implement ExtensibleSyncer")
 	}
@@ -81,7 +85,9 @@ func TestInitializeEncryptionFailsWithoutSyncer(t *testing.T) {
 func TestInitializeEncryptionFailsWithEmptyPickleKey(t *testing.T) {
 	client := newLoggedInTestClient(t)
 
-	_, err := initializeEncryption(client, nil, filepath.Join(t.TempDir(), "crypto.db"))
+	database, _ := (&db.SqliteProvider{}).Get(filepath.Join(t.TempDir(), "crypto.db"))
+
+	_, err := initializeEncryption(client, nil, database)
 	if err == nil {
 		t.Fatalf("expected error when pickle key is empty")
 	}
