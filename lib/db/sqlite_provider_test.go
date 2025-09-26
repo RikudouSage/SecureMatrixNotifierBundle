@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"lib/helper"
 	"os"
+	"path/filepath"
 	"testing"
 
 	"github.com/rs/zerolog/log"
@@ -13,32 +14,35 @@ import (
 )
 
 func TestDsn(t *testing.T) {
-	tempDir := os.TempDir() + "/matrix_notifier/sqlite_provider_test"
-
-	if _, err := os.Stat(tempDir); err == nil {
-		err := os.RemoveAll(tempDir)
-		if err != nil {
-			t.Fatalf("error removing temp dir: %v", err)
-		}
-	}
-
-	if err := os.MkdirAll(tempDir, 0755); err != nil {
+	tempDir := filepath.Join(os.TempDir(), "matrix_notifier", "sqlite_provider_test")
+	_ = os.RemoveAll(tempDir)
+	if err := os.MkdirAll(tempDir, 0o755); err != nil {
 		t.Fatalf("error creating temp dir: %v", err)
 	}
+	t.Cleanup(func() { _ = os.RemoveAll(tempDir) })
 
-	dsns := map[string]*string{
-		fmt.Sprintf("%s/db1.sqlite3", tempDir):                                   nil,
-		fmt.Sprintf("sqlite://%s/db2.sqlite3", tempDir):                          nil,
-		fmt.Sprintf("sqlite:////%s/db3.sqlite3", tempDir):                        nil,
-		fmt.Sprintf("sqlite://%s/db4.sqlite3?_txlock=immediate", tempDir):        nil,
-		fmt.Sprintf("sqlite://%s/nested/db5.sqlite3?_txlock=immediate", tempDir): helper.ToPointer(fmt.Sprintf("/%s/nested/db5.sqlite3", tempDir)),
+	type config struct {
+		dsn          string
+		expectedFile *string
 	}
 
-	i := 0
-	for dsn, expectedFile := range dsns {
-		i++
+	dsns := []config{
+		{dsn: fmt.Sprintf("%s/db1.sqlite3", tempDir)},
+		{dsn: fmt.Sprintf("sqlite://%s/db2.sqlite3", tempDir)},
+		{dsn: fmt.Sprintf("sqlite:////%s/db3.sqlite3", tempDir)},
+		{dsn: fmt.Sprintf("sqlite://%s/db4.sqlite3?_txlock=immediate", tempDir)},
+		{
+			dsn:          fmt.Sprintf("sqlite://%s/nested/db5.sqlite3?_txlock=immediate", tempDir),
+			expectedFile: helper.ToPointer(fmt.Sprintf("/%s/nested/db5.sqlite3", tempDir)),
+		},
+	}
+
+	for i, cfg := range dsns {
+		expectedFile := cfg.expectedFile
+		dsn := cfg.dsn
+
 		if expectedFile == nil {
-			expectedFile = helper.ToPointer(fmt.Sprintf("%s/db%d.sqlite3", tempDir, i))
+			expectedFile = helper.ToPointer(fmt.Sprintf("%s/db%d.sqlite3", tempDir, i+1))
 		}
 		provider := &SqliteProvider{}
 		if !provider.supports(dsn) {
@@ -67,6 +71,4 @@ func TestDsn(t *testing.T) {
 			t.Fatalf("file %s does not exist", *expectedFile)
 		}
 	}
-
-	_ = os.RemoveAll(tempDir)
 }
