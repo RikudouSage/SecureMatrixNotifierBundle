@@ -10,7 +10,7 @@ services:
     class: Rikudou\MatrixNotifier\Transport\MatrixTransportFactory
     arguments:
       $accessToken: '%rikudou.internal.matrix.access_token%'
-      $databasePath: '%rikudou.internal.matrix.database_path%'
+      $databaseDsn: '%rikudou.internal.matrix.database_dsn%'
       $deviceId: '%rikudou.internal.matrix.device_id%'
       $pickleKey: '%rikudou.internal.matrix.pickle_key%'
       $recoveryKey: '%rikudou.internal.matrix.recovery_key%'
