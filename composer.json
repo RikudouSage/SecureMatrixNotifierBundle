@@ -11,8 +11,7 @@
     "symfony/console": "^7.3",
     "symfony/http-kernel": "^7.3",
     "symfony/dependency-injection": "^7.3",
-    "symfony/config": "^7.3",
-    "symfony/yaml": "^7.3"
+    "symfony/config": "^7.3"
   },
   "autoload": {
     "psr-4": {
@@ -22,7 +21,8 @@
   "require-dev": {
     "symfony/matrix-notifier": "^7.3",
     "phpunit/phpunit": "^12.3",
-    "dg/bypass-finals": "^1.9"
+    "dg/bypass-finals": "^1.9",
+    "symfony/yaml": "^7.3"
   },
   "autoload-dev": {
     "psr-4": {
