@@ -55,6 +55,10 @@ jobs:
           retention-days: 1
 
   merge-coverages:
+    permissions:
+      contents: read
+      issues: write
+      pull-requests: write
     name: Merge coverages
     needs:
       - go-coverage
