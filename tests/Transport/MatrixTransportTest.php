@@ -17,6 +17,7 @@ use Rikudou\MatrixNotifier\Transport\MatrixTransport;
 use Symfony\Component\Notifier\Bridge\Matrix\MatrixOptions as SymfonyMatrixOptions;
 use Symfony\Component\Notifier\Message\ChatMessage;
 use Symfony\Component\Notifier\Message\SmsMessage;
+use Symfony\Component\Notifier\Message\MessageOptionsInterface;
 use Symfony\Component\Notifier\Exception\UnsupportedMessageTypeException;
 
 #[CoversClass(MatrixTransport::class)]
@@ -212,6 +213,77 @@ final class MatrixTransportTest extends TestCase
         $this->expectExceptionMessage('Recipient id is required.');
 
         $transport->send($message);
+    }
+
+    public function testSendThrowsWhenMessageHasNoOptions(): void
+    {
+        $bridge = $this->createMock(GolangLibBridge::class);
+        $bridge->expects($this->never())->method('send');
+
+        $transport = new MatrixTransport(
+            accessToken: 'access-token',
+            recoveryKey: 'recovery-key',
+            pickleKey: 'pickle-key',
+            deviceId: 'DEVICEID',
+            databaseDsn: 'sqlite:///var/matrix.db',
+            bridge: $bridge,
+            defaultRecipient: '@default:example.com',
+        );
+
+        $message = new ChatMessage('Body');
+
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('Recipient id is required.');
+
+        $transport->send($message);
+    }
+
+    public function testSendWithGenericOptions(): void
+    {
+        $bridge = $this->createMock(GolangLibBridge::class);
+        $bridge->expects($this->once())
+            ->method('send')
+            ->with($this->callback(function (BridgeMessage $message): bool {
+                $this->assertSame(MessageType::TextMessage, $message->messageType);
+                $this->assertSame(RenderingType::PlainText, $message->renderingType);
+                $this->assertSame('@generic:example.com', $message->recipient);
+
+                return true;
+            }))
+            ->willReturn('event-id');
+
+        $transport = new MatrixTransport(
+            accessToken: 'access-token',
+            recoveryKey: 'recovery-key',
+            pickleKey: 'pickle-key',
+            deviceId: 'DEVICEID',
+            databaseDsn: 'sqlite:///var/matrix.db',
+            bridge: $bridge,
+            defaultRecipient: '@default:example.com',
+        );
+
+        $message = new ChatMessage('Body', new class('@generic:example.com') implements MessageOptionsInterface {
+            public function __construct(
+                private readonly string $recipientId,
+            ) {
+            }
+
+            public function toArray(): array
+            {
+                return [
+                    'recipient_id' => $this->recipientId,
+                ];
+            }
+
+            public function getRecipientId(): ?string
+            {
+                return $this->recipientId;
+            }
+        });
+
+        $sentMessage = $transport->send($message);
+
+        $this->assertSame('event-id', $sentMessage->getMessageId());
     }
 
     public function testSendThrowsOnNonChatMessage(): void
