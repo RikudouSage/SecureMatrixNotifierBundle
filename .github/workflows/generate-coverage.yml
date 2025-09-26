@@ -79,6 +79,7 @@ jobs:
           badge: true
           hide_complexity: true
           output: file
+          indicators: false
       - name: Comment coverage summary on PR
         if: github.event_name == 'pull_request'
         uses: marocchino/sticky-pull-request-comment@v2
