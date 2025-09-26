@@ -16,6 +16,8 @@ jobs:
           php-version: '8.4'
           extensions: ffi
           coverage: xdebug
+      - name: Install dependencies
+        run: composer install
       - name: Generate coverage
         run: php -d xdebug.mode=coverage vendor/bin/phpunit --coverage-cobertura=cobertura1.xml
       - name: Upload
