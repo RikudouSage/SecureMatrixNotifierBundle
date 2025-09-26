@@ -16,8 +16,8 @@ final readonly class Configuration implements ConfigurationInterface
         $rootNode
             ->addDefaultsIfNotSet()
             ->children()
-                ->stringNode('database_path')
-                    ->info('The path to the SQLite database which the Matrix maintains internally, it holds stuff such as room state, cryptography configuration and is needed for the bridge to function. If you lose this database, you must login again and get a new device ID.')
+                ->stringNode('database_dsn')
+                    ->info('The DSN for a database used to store the bridge internal data. Currently supports only SQLite. If you provide only a filepath, SQLite is assumed.')
                     ->defaultValue('%kernel.project_dir%/var/matrix_notifier/matrix_internal.sqlite3')
                 ->end()
                 ->stringNode('pickle_key')

@@ -16,7 +16,7 @@ final class RikudouMatrixNotifierExtension extends Extension
 
         $configuration = $this->processConfiguration(new Configuration(), $configs);
 
-        $container->setParameter('rikudou.internal.matrix.database_path', $configuration['database_path']);
+        $container->setParameter('rikudou.internal.matrix.database_dsn', $configuration['database_dsn']);
         $container->setParameter('rikudou.internal.matrix.pickle_key', $configuration['pickle_key'] ?? null);
         $container->setParameter('rikudou.internal.matrix.device_id', $configuration['device_id'] ?? null);
         $container->setParameter('rikudou.internal.matrix.access_token', $configuration['access_token'] ?? null);

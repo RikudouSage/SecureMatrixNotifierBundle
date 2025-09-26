@@ -10,7 +10,6 @@ use Symfony\Component\Notifier\Bridge\Matrix\MatrixTransport as SymfonyMatrixTra
 use Symfony\Component\Notifier\Exception\UnsupportedSchemeException;
 use Symfony\Component\Notifier\Transport\AbstractTransportFactory;
 use Symfony\Component\Notifier\Transport\Dsn;
-use Symfony\Component\Notifier\Transport\TransportInterface;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
@@ -25,7 +24,7 @@ final class MatrixTransportFactory extends AbstractTransportFactory
         #[SensitiveParameter] private readonly ?string $accessToken,
         #[SensitiveParameter] private readonly ?string $recoveryKey,
         private readonly ?string $defaultRecipient,
-        private readonly string $databasePath,
+        private readonly string $databaseDsn,
         private readonly GolangLibBridge $bridge,
         ?EventDispatcherInterface $dispatcher = null,
         ?HttpClientInterface $client = null,
@@ -67,17 +66,12 @@ final class MatrixTransportFactory extends AbstractTransportFactory
             throw new MatrixException("The access token must be provided either as part of DSN or as a configuration parameter.");
         }
 
-        $databaseDirectory = dirname($this->databasePath);
-        if (!is_dir($databaseDirectory) && !@mkdir($databaseDirectory, 0777, true) && !is_dir($databaseDirectory)) {
-            throw new MatrixException(sprintf('Failed to create the database directory "%s".', $databaseDirectory));
-        }
-
         return new MatrixTransport(
             accessToken: $token,
             recoveryKey: $this->recoveryKey,
             pickleKey: $this->pickleKey,
             deviceId: $this->deviceId,
-            dbPath: $this->databasePath,
+            databaseDsn: $this->databaseDsn,
             bridge: $this->bridge,
             defaultRecipient: $this->defaultRecipient,
             client: $this->client,

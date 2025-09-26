@@ -16,7 +16,7 @@ final readonly class BridgeMessage
         public RenderingType $renderingType,
         public string $message,
         public string $recipient,
-        public string $databasePath,
+        public string $databaseDsn,
         #[SensitiveParameter] public string $accessToken,
         #[SensitiveParameter] public string $recoveryKey,
         #[SensitiveParameter] public string $pickleKey,

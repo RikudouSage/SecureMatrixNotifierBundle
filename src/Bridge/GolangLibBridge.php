@@ -45,7 +45,7 @@ final readonly class GolangLibBridge
                 $bridgeMessage->renderingType->value,
                 $bridgeMessage->message,
                 $bridgeMessage->recipient,
-                $bridgeMessage->databasePath,
+                $bridgeMessage->databaseDsn,
                 $bridgeMessage->accessToken,
                 $bridgeMessage->recoveryKey,
                 $bridgeMessage->pickleKey,

@@ -2,7 +2,9 @@ package matrix
 
 import (
 	"context"
+	"errors"
 	"fmt"
+	"lib/db"
 	"lib/types"
 	"sync"
 
@@ -17,7 +19,7 @@ func SendMessage(
 	renderingType types.RenderingType,
 	message string,
 	recipient string,
-	databasePath string,
+	databaseDsn string,
 	accessToken string,
 	recoveryKey string,
 	pickleKey []byte,
@@ -25,6 +27,16 @@ func SendMessage(
 	deviceId id.DeviceID,
 	clientFactory MautrixFactory,
 ) (messageId string, err error) {
+	databaseProvider := db.FindProvider(databaseDsn)
+	if databaseProvider == nil {
+		err = errors.New("databaseProvider is nil, the databaseProvider DSN is invalid")
+		return
+	}
+	database, err := databaseProvider.Get(databaseDsn)
+	if err != nil {
+		return
+	}
+
 	if clientFactory == nil {
 		clientFactory = func() (*mautrix.Client, error) {
 			return mautrix.NewClient(url, "", accessToken)
@@ -46,7 +58,7 @@ func SendMessage(
 	client.DeviceID = deviceId
 	client.Syncer = syncer
 
-	crypto, err := initializeEncryption(client, pickleKey, databasePath)
+	crypto, err := initializeEncryption(client, pickleKey, database)
 	if err != nil {
 		return
 	}
