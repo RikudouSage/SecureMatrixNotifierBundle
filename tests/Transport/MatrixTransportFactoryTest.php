@@ -75,6 +75,37 @@ final class MatrixTransportFactoryTest extends TestCase
         $this->assertSame('bridge-result', $sentMessage->getMessageId());
     }
 
+    public function testCreatePrefersAccessTokenFromDsnWhenProvided(): void
+    {
+        $bridge = $this->createMock(GolangLibBridge::class);
+        $bridge->expects($this->once())
+            ->method('send')
+            ->with($this->callback(function (BridgeMessage $message): bool {
+                $this->assertSame('dsn-token', $message->accessToken);
+                $this->assertSame('@john:example.com', $message->recipient);
+
+                return true;
+            }))
+            ->willReturn('event-id');
+
+        $factory = new MatrixTransportFactory(
+            pickleKey: 'pickle',
+            deviceId: 'DEVICE',
+            accessToken: 'config-token',
+            recoveryKey: 'recovery',
+            defaultRecipient: '@default:example.com',
+            databaseDsn: 'sqlite:///var/matrix.db',
+            bridge: $bridge,
+        );
+
+        $transport = $factory->create(new Dsn('smatrix://matrix.example.com?accessToken=dsn-token'));
+        $message = new ChatMessage('Body', new MatrixOptions('@john:example.com'));
+
+        $sentMessage = $transport->send($message);
+
+        $this->assertSame('event-id', $sentMessage->getMessageId());
+    }
+
     public function testCreateThrowsWhenMissingPickleKey(): void
     {
         $factory = new MatrixTransportFactory(
