@@ -63,8 +63,10 @@ jobs:
     steps:
       - name: Download coverages
         uses: actions/download-artifact@v5
+      - name: Install merger
+        run: npm -g install cobertura-merge
       - name: Merge coverages
-        run: npx -y cobertura-merge -o cobertura.xml php=cobertura1.xml go=cobertura2.xml
+        run: cobertura-merge -o cobertura.xml php=cobertura1.xml go=cobertura2.xml
       - name: Generate coverage summary
         uses: irongut/CodeCoverageSummary@v1.3.0
         with:
