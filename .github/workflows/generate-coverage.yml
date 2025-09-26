@@ -76,7 +76,7 @@ jobs:
           hide_complexity: true
           output: file
       - name: Comment coverage summary on PR
-        if: github.event_name == 'pull_request' && hashFiles('coverage.xml') != ''
+        if: github.event_name == 'pull_request'
         uses: marocchino/sticky-pull-request-comment@v2
         with:
           recreate: true
