@@ -65,6 +65,8 @@ jobs:
         uses: actions/download-artifact@v5
       - name: Install merger
         run: npm -g install cobertura-merge
+      - name: Debug
+        run: git status
       - name: Merge coverages
         run: cobertura-merge -o cobertura.xml php=cobertura1.xml go=cobertura2.xml
       - name: Generate coverage summary
