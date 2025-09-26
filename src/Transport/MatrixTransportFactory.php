@@ -35,9 +35,11 @@ final class MatrixTransportFactory extends AbstractTransportFactory
     protected function getSupportedSchemes(): array
     {
         $result = [self::SCHEME_NAME_CUSTOM];
+        // @codeCoverageIgnoreStart
         if (!class_exists(SymfonyMatrixTransport::class)) {
             $result[] = self::SCHEME_NAME;
         }
+        // @codeCoverageIgnoreEnd
 
         return $result;
     }
