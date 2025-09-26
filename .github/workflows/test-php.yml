@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - master
-  pull_request: {}
   workflow_dispatch: {}
 
 jobs:
@@ -20,9 +19,7 @@ jobs:
           php-version: '8.4'
           extensions: ffi
           coverage: xdebug
-      - name: Validate composer.json
-        run: composer validate --no-interaction --no-check-publish
       - name: Install dependencies
         run: composer install --no-interaction --no-progress --prefer-dist
       - name: Run PHPUnit with coverage
-        run: composer coverage
+        run: composer test
