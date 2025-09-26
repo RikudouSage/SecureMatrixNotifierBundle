@@ -25,4 +25,17 @@ jobs:
       - name: Install dependencies
         run: composer install --no-interaction --no-progress --prefer-dist
       - name: Run PHPUnit with coverage
-        run: composer coverage
+        run: php -d xdebug.mode=coverage ./vendor/bin/phpunit --coverage-clover=coverage.xml --coverage-text
+      - name: Generate coverage summary
+        if: always() && hashFiles('coverage.xml') != ''
+        uses: irongut/CodeCoverageSummary@v1.3.0
+        with:
+          filename: coverage.xml
+          format: markdown
+          output: file
+      - name: Comment coverage summary on PR
+        if: github.event_name == 'pull_request' && hashFiles('coverage.xml') != ''
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          recreate: true
+          path: code-coverage-results.md
