@@ -3,15 +3,17 @@
          xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/12.3/phpunit.xsd"
          bootstrap="tests/bootstrap.php"
          colors="true"
+         cacheDirectory=".phpunit.cache"
 >
-    <coverage cacheDirectory=".phpunit.cache/code-coverage">
+    <coverage/>
+    <source>
         <include>
             <directory suffix=".php">src</directory>
         </include>
         <exclude>
             <directory suffix=".php">tests</directory>
         </exclude>
-    </coverage>
+    </source>
     <testsuites>
         <testsuite name="SecureMatrixNotifierBundle Test Suite">
             <directory>tests</directory>

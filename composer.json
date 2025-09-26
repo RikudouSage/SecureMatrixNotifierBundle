@@ -24,6 +24,10 @@
     "phpunit/phpunit": "^12.3",
     "dg/bypass-finals": "^1.9"
   },
+  "scripts": {
+    "test": "vendor/bin/phpunit",
+    "coverage": "php -d xdebug.mode=coverage vendor/bin/phpunit --coverage-text"
+  },
   "autoload-dev": {
     "psr-4": {
       "Rikudou\\MatrixNotifier\\Tests\\": "tests/"
