@@ -68,13 +68,11 @@ func SendMessage(
 		return
 	}
 
-	readyChan := make(chan error)
+	readyChan := make(chan error, 1)
 	var onceSetupEncryption sync.Once
 
 	syncer.OnSync(func(ctx context.Context, resp *mautrix.RespSync, since string) bool {
 		onceSetupEncryption.Do(func() {
-			defer close(readyChan)
-
 			machine := crypto.Machine()
 			keyId, keyData, err := machine.SSSS.GetDefaultKeyData(ctx)
 			if err != nil {
@@ -108,31 +106,36 @@ func SendMessage(
 		return true
 	})
 
-	errChan := make(chan error)
+	errChan := make(chan error, 1)
 	go func() {
 		if err := client.Sync(); err != nil {
-			errChan <- err
-			close(errChan)
+			select {
+			case errChan <- err:
+			default:
+			}
 		}
 	}()
 	defer client.StopSync()
 
-	err = <-readyChan
+	select {
+	case err = <-readyChan:
+	case err = <-errChan:
+	}
 	if err != nil {
 		return
 	}
 
-	respChan := make(chan *mautrix.RespSendEvent)
+	respChan := make(chan *mautrix.RespSendEvent, 1)
 	go func() {
-		defer close(respChan)
-
 		var response *mautrix.RespSendEvent
 		var err error
 
 		_, err = client.State(context.Background(), roomId)
 		if err != nil {
-			errChan <- err
-			close(errChan)
+			select {
+			case errChan <- err:
+			default:
+			}
 			return
 		}
 
@@ -150,8 +153,10 @@ func SendMessage(
 				content = format.TextToContent(message)
 				break
 			default:
-				errChan <- fmt.Errorf("unsupported rendering type: %s", renderingType)
-				close(errChan)
+				select {
+				case errChan <- fmt.Errorf("unsupported rendering type: %s", renderingType):
+				default:
+				}
 				return
 			}
 
@@ -171,8 +176,10 @@ func SendMessage(
 		}
 
 		if err != nil {
-			errChan <- err
-			close(errChan)
+			select {
+			case errChan <- err:
+			default:
+			}
 			return
 		}
 

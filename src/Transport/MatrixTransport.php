@@ -67,7 +67,7 @@ final class MatrixTransport extends AbstractTransport
             );
         }
 
-        if (!$message->getRecipientId()) {
+        if (!$options->getRecipientId() && !$message->getRecipientId() && !$this->defaultRecipient) {
             throw new LogicException('Recipient id is required.');
         }
 
@@ -75,7 +75,7 @@ final class MatrixTransport extends AbstractTransport
             messageType: $options->messageType ?? MessageType::TextMessage,
             renderingType: $options->renderingType ?? RenderingType::PlainText,
             message: $message->getSubject(),
-            recipient: $message->getRecipientId(),
+            recipient: $options->getRecipientId() ?? $message->getRecipientId() ?? $this->defaultRecipient ?? throw new LogicException('Recipient id is required.'),
             databaseDsn: $this->databaseDsn,
             accessToken: $this->accessToken,
             recoveryKey: $this->recoveryKey,
@@ -98,6 +98,10 @@ final class MatrixTransport extends AbstractTransport
 
     public function supports(MessageInterface $message): bool
     {
-        return $message instanceof ChatMessage && ($message->getOptions() === null || $message->getOptions() instanceof MatrixOptions);
+        return $message instanceof ChatMessage && (
+            $message->getOptions() === null
+            || $message->getOptions() instanceof MatrixOptions
+            || $message->getOptions() instanceof SymfonyMatrixOptions
+        );
     }
 }
