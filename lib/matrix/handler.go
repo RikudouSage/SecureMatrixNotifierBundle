@@ -1,16 +1,11 @@
 package matrix
 
 import (
-	"context"
 	"errors"
-	"fmt"
 	"lib/db"
 	"lib/types"
-	"sync"
 
 	"maunium.net/go/mautrix"
-	"maunium.net/go/mautrix/event"
-	"maunium.net/go/mautrix/format"
 	"maunium.net/go/mautrix/id"
 )
 
@@ -27,6 +22,11 @@ func SendMessage(
 	deviceId id.DeviceID,
 	clientFactory MautrixFactory,
 ) (messageId string, err error) {
+	if recipient == "" {
+		err = errors.New("recipient cannot be empty")
+		return
+	}
+
 	databaseProvider := db.FindProvider(databaseDsn)
 	if databaseProvider == nil {
 		err = errors.New("databaseProvider is nil, the databaseProvider DSN is invalid")
@@ -43,20 +43,10 @@ func SendMessage(
 		}
 	}
 
-	client, err := clientFactory()
+	client, syncer, err := createClient(clientFactory, deviceId)
 	if err != nil {
 		return
 	}
-	whoami, err := client.Whoami(context.Background())
-	if err != nil {
-		return
-	}
-	client.UserID = whoami.UserID
-
-	syncer := mautrix.NewDefaultSyncer()
-
-	client.DeviceID = deviceId
-	client.Syncer = syncer
 
 	crypto, err := initializeEncryption(client, pickleKey, database)
 	if err != nil {
@@ -68,131 +58,19 @@ func SendMessage(
 		return
 	}
 
-	readyChan := make(chan error, 1)
-	var onceSetupEncryption sync.Once
-
-	syncer.OnSync(func(ctx context.Context, resp *mautrix.RespSync, since string) bool {
-		onceSetupEncryption.Do(func() {
-			machine := crypto.Machine()
-			keyId, keyData, err := machine.SSSS.GetDefaultKeyData(ctx)
-			if err != nil {
-				readyChan <- err
-				return
-			}
-			key, err := keyData.VerifyRecoveryKey(keyId, recoveryKey)
-			if err != nil {
-				readyChan <- err
-				return
-			}
-			err = machine.FetchCrossSigningKeysFromSSSS(ctx, key)
-			if err != nil {
-				readyChan <- err
-				return
-			}
-			err = machine.SignOwnDevice(ctx, machine.OwnIdentity())
-			if err != nil {
-				readyChan <- err
-				return
-			}
-			err = machine.SignOwnMasterKey(ctx)
-			if err != nil {
-				readyChan <- err
-				return
-			}
-
-			readyChan <- nil
-		})
-
-		return true
-	})
-
-	errChan := make(chan error, 1)
-	go func() {
-		if err := client.Sync(); err != nil {
-			select {
-			case errChan <- err:
-			default:
-			}
-		}
-	}()
+	errChan, readyChan := startSyncAndWaitForReady(client, syncer, crypto, recoveryKey)
 	defer client.StopSync()
 
-	select {
-	case err = <-readyChan:
-	case err = <-errChan:
-	}
+	err = waitUntilReady(readyChan, errChan)
 	if err != nil {
 		return
 	}
 
-	respChan := make(chan *mautrix.RespSendEvent, 1)
-	go func() {
-		var response *mautrix.RespSendEvent
-		var err error
-
-		_, err = client.State(context.Background(), roomId)
-		if err != nil {
-			select {
-			case errChan <- err:
-			default:
-			}
-			return
-		}
-
-		switch messageType {
-		case types.MessageTypeTextMessage:
-			var content event.MessageEventContent
-			switch renderingType {
-			case types.RenderingTypeHtml:
-				content = format.HTMLToContent(message)
-				break
-			case types.RenderingTypeMarkdown:
-				content = format.RenderMarkdown(message, true, true)
-				break
-			case types.RenderingTypePlainText:
-				content = format.TextToContent(message)
-				break
-			default:
-				select {
-				case errChan <- fmt.Errorf("unsupported rendering type: %s", renderingType):
-				default:
-				}
-				return
-			}
-
-			response, err = client.SendMessageEvent(
-				context.Background(),
-				roomId,
-				event.EventMessage,
-				content,
-			)
-			break
-		case types.MessageTypeNotice:
-			response, err = client.SendNotice(context.Background(), roomId, message)
-			break
-		default:
-			err = fmt.Errorf("unsupported message type: %s", messageType)
-			break
-		}
-
-		if err != nil {
-			select {
-			case errChan <- err:
-			default:
-			}
-			return
-		}
-
-		respChan <- response
-	}()
-
-	select {
-	case err = <-errChan:
-		break
-	case response := <-respChan:
-		messageId = string(response.EventID)
-		break
+	response, err := sendMessageWithSync(client, roomId, messageType, renderingType, message, errChan)
+	if err != nil {
+		return
 	}
+	messageId = string(response.EventID)
 
 	return
 }
