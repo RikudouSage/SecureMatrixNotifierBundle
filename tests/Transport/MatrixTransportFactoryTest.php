@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Rikudou\MatrixNotifier\Tests\Transport;
 
 use LogicException;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Rikudou\MatrixNotifier\Bridge\BridgeMessage;
@@ -19,6 +20,7 @@ use Symfony\Component\Notifier\Transport\Dsn;
 use Symfony\Component\Notifier\Exception\UnsupportedSchemeException;
 use Symfony\Component\Notifier\Message\ChatMessage;
 
+#[AllowMockObjectsWithoutExpectations]
 #[CoversClass(MatrixTransportFactory::class)]
 final class MatrixTransportFactoryTest extends TestCase
 {

@@ -63,6 +63,9 @@ final readonly class GolangLibBridge
             if (isset($result)) {
                 FFI::free($result);
             }
+            if (isset($err) && !FFI::isNull($err)) {
+                FFI::free($err);
+            }
         }
     }
 
@@ -72,23 +75,35 @@ final readonly class GolangLibBridge
         $deviceId = $this->ffi->new('char*');
         $accessToken = $this->ffi->new('char*');
 
-        $this->ffi->Login(
-            $homeserver,
-            $username,
-            $password,
-            FFI::addr($err),
-            FFI::addr($deviceId),
-            FFI::addr($accessToken),
-        );
+        try {
+            $this->ffi->Login(
+                $homeserver,
+                $username,
+                $password,
+                FFI::addr($err),
+                FFI::addr($deviceId),
+                FFI::addr($accessToken),
+            );
 
-        if (!FFI::isNull($err)) {
-            throw new MatrixException(FFI::string($err));
+            if (!FFI::isNull($err)) {
+                throw new MatrixException(FFI::string($err));
+            }
+
+            return new LoginResponse(
+                accessToken: FFI::string($accessToken),
+                deviceId: FFI::string($deviceId),
+            );
+        } finally {
+            if (!FFI::isNull($err)) {
+                FFI::free($err);
+            }
+            if (!FFI::isNull($accessToken)) {
+                FFI::free($accessToken);
+            }
+            if (!FFI::isNull($deviceId)) {
+                FFI::free($deviceId);
+            }
         }
-
-        return new LoginResponse(
-            accessToken: FFI::string($accessToken),
-            deviceId: FFI::string($deviceId),
-        );
     }
 
     private function getBaseFileName(): string
